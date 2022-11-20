@@ -1,0 +1,11 @@
+[Unit]
+Description=Boot time processing of tpm2-luks-helper
+After=boot.mount boot-efi.mount
+Requires=boot.mount boot-efi.mount
+
+[Service]
+ExecStart=/usr/local/bin/tpm2-luks-helper on-boot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+DPkg::Pre-Install-Pkgs {
+    "while read -r pkg; do case $(basename $pkg) in grub*) touch /tmp/.grub-updated && exit 0; esac done < /dev/stdin";
+};
+DPkg::Post-Invoke {
+    "[ -f /tmp/.grub-updated ] && { /opt/tpm2-luks-helper/grub/install-grub.sh; rm -f /tmp/.grub-updated; }; exit 0";
+};

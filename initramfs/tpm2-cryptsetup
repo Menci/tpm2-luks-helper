@@ -1,0 +1,35 @@
+#!/bin/sh
+
+trusted_boot() {
+	mkdir -p /boot
+	mount -T /etc/fstab.boot /boot
+	if [ -f /boot/trusted-boot-key ]; then
+		STATUS=0
+		cat /boot/trusted-boot-key
+	else
+		STATUS=1
+	fi
+	umount /boot
+	return $STATUS
+}
+
+unseal_tpm() {
+	tpm2-initramfs-tool unseal --pcrs 0,1,2,3,4,5,6,7,8,9
+}
+
+ask_password() {
+	stty -echo
+	echo -n "Please enter the passphrase for $CRYPTTAB_NAME ($CRYPTTAB_SOURCE): " >&2
+	read pass
+	echo >&2
+	stty echo
+	echo -n $pass
+}
+
+if KEY="$(trusted_boot)"; then
+	echo -n "$KEY"
+elif KEY="$(unseal_tpm)"; then
+	echo -n "$KEY"
+else
+	ask_password
+fi
